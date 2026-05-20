@@ -1,0 +1,18 @@
+---
+- name: Install Apache WebServer
+  hosts: localhost
+  become: true
+
+  tasks:
+    - name: Install Apache on RedHat family
+      ansible.builtin.yum:
+        name: httpd
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Install Apache on Ubuntu/Debian family
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+        update_cache: true
+      when: ansible_facts['os_family'] == "Debian"

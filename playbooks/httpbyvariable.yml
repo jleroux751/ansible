@@ -1,0 +1,21 @@
+---
+- name: Package installation
+  hosts: all
+  become: yes
+
+  vars:
+    pack: apache2
+
+  tasks:
+
+    - name: Install package (Ubuntu/Debian)
+      ansible.builtin.apt:
+        name: "{{ pack }}"
+        state: present
+        update_cache: yes
+      when: ansible_pkg_mgr == "apt"
+
+    - name: Start service
+      ansible.builtin.service:
+        name: "{{ pack }}"
+        state: started

@@ -1,0 +1,13 @@
+---
+- name: Add or update user password
+  hosts: all
+  become: yes
+  vars_files:
+    - /etc/ansible/playbooks/vault.yml
+  
+  tasks:
+  - name: Change "george" password
+    ansible.builtin.user:
+      name: george
+      update_password: always
+      password: "{{ newpassword|password_hash('sha512') }}"

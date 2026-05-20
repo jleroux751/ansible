@@ -1,0 +1,22 @@
+Passw0rd*2000!.
+
+dpkg -s apache2
+systemctl status apache2
+apt list --installed | grep apache2
+dpkg -l | grep apache2
+
+### Firewall ###
+dpkg -l | grep ufw
+sudo ufw status
+sudo ufw status verbose
+curl linuxclient1.cloud2train.ca
+
+### remove bash 1 ###
+dpkg -l | grep apache2
+dpkg -l | grep telnet
+apt purge apache2 -y
+apt purge telnet -y
+sudo apt purge inetutils-telnet -y
+sudo apt autoremove -y
+dpkg -l | grep apache2
+dpkg -l | grep telnet

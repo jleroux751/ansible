@@ -1,0 +1,13 @@
+---
+- name: Copy file from local to remote clients
+  hosts: all
+  
+  tasks:
+  - name: Copying file 
+    become: true
+    copy:
+     src: /home/sysadmin/some.cfg
+     dest: /tmp
+     owner: sysadmin
+     group: sysadmin
+     mode: 0644

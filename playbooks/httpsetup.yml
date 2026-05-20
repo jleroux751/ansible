@@ -1,0 +1,26 @@
+- name: Setup apache2 and open firewall port
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install apache2
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+        update_cache: yes
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Start and enable apache2
+      ansible.builtin.systemd:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Allow HTTP through UFW
+      ansible.builtin.ufw:
+        rule: allow
+        port: '80'
+        proto: tcp

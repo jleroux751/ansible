@@ -1,0 +1,24 @@
+---
+- name: apache and telnet
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install apache2
+      apt:
+        name: apache2
+        state: present
+        update_cache: true
+
+    - name: Start apache2
+      service:
+        name: apache2
+        state: started
+        enabled: true
+      tags: start_apache2
+
+    - name: Install telnet
+      apt:
+        name: telnet
+        state: present
+      tags: telnet
