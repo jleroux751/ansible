@@ -1,4 +1,12 @@
-Passw0rd*2000!.
+• Check syntax of playbook
+# anisble-playbook --syntax-check first.yml
+Or to do a dry run
+# anisble-playbook --check first.yml
+
+Listing host file
+# ansible-inventory --list
+OR
+# ansible all --list-hosts
 
 dpkg -s apache2
 systemctl status apache2

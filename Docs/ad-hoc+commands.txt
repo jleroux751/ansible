@@ -4,13 +4,13 @@ Ping localhost
 # ansible localhost -m ping
 
 Creating a file on all remote clients
-# ansible all -m file -a "path=/home/iafzal/adhoc1 state=touch mode=700"
+# ansible all -m file -a "path=/home/sysadmin/adhoc1 state=touch mode=700"
 
 Deleting a file on all remote clients
-# ansible all -m file -a "path=/home/iafzal/adhoc1 state=absent"
+# ansible all -m file -a "path=/home/sysadmin/adhoc1 state=absent"
 
 Copying a file to remote clients
-# ansible all -m copy -a "src=/tmp/adhoc2 dest=/home/iafzal/adhoc2"
+# ansible all -m copy -a "src=/tmp/adhoc2 dest=/home/sysadmin/adhoc2"
 
 Installing package (telnet and httpd-manual)
 # ansible all -m yum -a "name=telnet state=present"
@@ -34,7 +34,7 @@ Creating a user on remote clients
 # ansible all -m user -a "name=jsmith home=/home/jsmith shell=/bin/bash state=present"
 
 To add a user to a different group
-# ansible all -m user -a "name=jsmith group=iafzal"
+# ansible all -m user -a "name=jsmith group=sysadmin"
 
 Deleting a user on remote clients
 # ansible all -m user -a "name=jsmith home=/home/jsmith shell=/bin/bash state=absent"
