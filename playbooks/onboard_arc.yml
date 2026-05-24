@@ -1,0 +1,11 @@
+---
+- name: Onboard Linux servers to Azure Arc
+  hosts: arc_hosts
+  gather_facts: true
+
+  # Keep your existing vault in the same place:
+  vars_files:
+    - ../group_vars/arc_hosts/vault.yml
+
+  roles:
+    - role: arc_onboard

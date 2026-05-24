@@ -1,0 +1,64 @@
+
+Passw0rd*2000!.
+
+
+# Create SPN
+az ad sp create-for-rbac --name Ansible_SPN --role Contributor --scopes /subscriptions/bf14bb08-5739-4b84-8606-ae8537cda18a/resourceGroups/HybridServers
+# client id: fa7a507a-21e4-41bf-8055-6f5310be0c04
+# secret: JiK8Q~qJE~Ajsh.zns84n39DxrY9Ac372HrNYcJR
+
+# Encrypt String
+ansible-vault encrypt_string 'JiK8Q~qJE~Ajsh.zns84n39DxrY9Ac372HrNYcJR' --name 'arc_service_principal_secret'
+
+# Variable
+vault_azure_client_id: "fa7a507a-21e4-41bf-8055-6f5310be0c04"
+vault_azure_client_secret: "JiK8Q~qJE~Ajsh.zns84n39DxrY9Ac372HrNYcJR"
+vault_azure_tenant_id: "cd507fa5-4402-47ea-b6ff-43fec5d90bcf"
+vault_azure_subscription_id: "bf14bb08-5739-4b84-8606-ae8537cda18a"
+
+### PLAYBOOK ###
+
+#>>>>>> enable env
+source ~/ansible-azure-env/bin/activate
+
+# check
+ansible-playbook -check -i hosts playbooks/onboard_arc.yml --ask-vault-pass
+ansible-playbook -i hosts playbooks/onboard_arc.yml --syntax-check --ask-vault-pass
+
+# view vault
+ansible-vault view group_vars/arc_hosts/vault.yml --ask-vault-pass
+
+# execute playbook
+ansible-playbook -i hosts playbooks/onboard_arc.yml \
+  --ask-vault-pass \
+  --ask-pass \
+  --ask-become-pass
+
+### Remove Arc Agent
+# Disconnect first
+sudo azcmagent disconnect --force-local-only
+
+# Remove package
+sudo apt purge azcmagent -y
+
+# Optional cleanup
+sudo rm -rf /var/lib/GuestConfig /opt/azcmagent
+
+### Defender extention
+mkdir -p roles/arc_defender_extension/{defaults,tasks,meta}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

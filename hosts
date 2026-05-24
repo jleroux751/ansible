@@ -15,9 +15,19 @@
 ## 192.168.100.1
 ## 192.168.100.10
 
-[labclients]
-linuxclient1.cloud2train.ca ansible_python_interpreter=/usr/bin/python3
-#linuxclient2.cloud2train.ca ansible_python_interpreter=/usr/bin/python3
+[arc_hosts]
+#linuxclient1.cloud2train.ca ansible_python_interpreter=/usr/bin/python3
+#linuxclient2.cloud2train.ca
+
+linuxclient1.cloud2train.ca ansible_user=sysadmin ansible_python_interpreter=/usr/bin/python3
+linuxclient2.cloud2train.ca ansible_user=sysadmin ansible_python_interpreter=/usr/bin/python3
+
+
+[arc_hosts:vars]
+ansible_user=sysadmin
+ansible_become=true
+ansible_become_method=sudo
+
 
 # Ex 2: A collection of hosts belonging to the 'webservers' group:
 

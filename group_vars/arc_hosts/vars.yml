@@ -1,0 +1,5 @@
+azure_arc_resource_group: "my-arc-rg"
+azure_arc_location : "canadacentral"
+
+azure_arc_subscription_id: "{{ vault_azure_subscription_id }}"
+azure_arc_tenant_id: "{{ vault_azure_tenant_id }}"

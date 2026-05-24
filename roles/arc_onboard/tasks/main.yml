@@ -1,0 +1,30 @@
+---
+- name: Validate required vaulted variables are present
+  ansible.builtin.assert:
+    that:
+      - vault_azure_client_id is defined
+      - vault_azure_client_secret is defined
+      - vault_azure_tenant_id is defined
+      - vault_azure_subscription_id is defined
+    fail_msg: >
+      Missing one or more required variables:
+      vault_azure_client_id, vault_azure_client_secret, vault_azure_tenant_id, vault_azure_subscription_id.
+  no_log: true
+
+- name: Onboard host to Azure Arc (wrapper)
+  block:
+    - name: Call official azure.azcollection.azure_arc role
+      ansible.builtin.include_role:
+        name: azure.azcollection.azure_arc
+  environment:
+    # What azure.azcollection expects for auth_source=env
+    ANSIBLE_AZURE_AUTH_SOURCE: "env"
+    AZURE_CLIENT_ID: "{{ vault_azure_client_id }}"
+    AZURE_SECRET: "{{ vault_azure_client_secret }}"
+    AZURE_TENANT: "{{ vault_azure_tenant_id }}"
+    AZURE_SUBSCRIPTION_ID: "{{ vault_azure_subscription_id }}"
+
+    # Optional: Azure SDK standard names (harmless)
+    AZURE_CLIENT_SECRET: "{{ vault_azure_client_secret }}"
+    AZURE_TENANT_ID: "{{ vault_azure_tenant_id }}"
+  no_log: true

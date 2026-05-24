@@ -1,0 +1,10 @@
+---
+# Optional: path to a vault file to include (encrypted vault is supported)
+# If empty, the role expects vault variables to already be loaded by the playbook/group_vars.
+arc_vault_file: ""
+
+# Whether to export Azure SDK “standard” environment names too (harmless)
+arc_export_azure_sdk_standard_env: true
+
+# The Azure collection uses auth_source=env when ANSIBLE_AZURE_AUTH_SOURCE=env
+arc_auth_source: "env"
