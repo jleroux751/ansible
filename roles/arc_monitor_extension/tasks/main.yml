@@ -1,0 +1,112 @@
+---
+- name: Validate required Arc variables
+  ansible.builtin.assert:
+    that:
+      - arc_resource_group | length > 0
+      - arc_location | length > 0
+      - arc_machine_name | length > 0
+    fail_msg: "Missing required vars: arc_resource_group, arc_location, arc_machine_name"
+
+- name: Decide target OS for AMA extension
+  ansible.builtin.set_fact:
+    _arc_monitor_os_effective: >-
+      {{
+        (arc_monitor_os | lower) if (arc_monitor_os | lower) in ['linux','windows']
+        else (
+          'windows' if (ansible_facts.os_family | default('') | lower) in ['windows']
+          else 'linux'
+        )
+      }}
+
+- name: Set AMA extension type for selected OS
+  ansible.builtin.set_fact:
+    _arc_monitor_extension_type: "{{ arc_monitor_type_windows if _arc_monitor_os_effective == 'windows' else arc_monitor_type_linux }}"
+
+- name: Check if AMA extension is already installed on Arc machine
+  azure.azcollection.azure_rm_arcmachineextensions_info:
+    resource_group: "{{ arc_resource_group }}"
+    machine_name: "{{ arc_machine_name }}"
+    # auth (same SP vault values you already use)
+    auth_source: "auto"
+    subscription_id: "{{ vault_azure_subscription_id }}"
+    client_id: "{{ vault_azure_client_id }}"
+    secret: "{{ vault_azure_client_secret }}"
+    tenant: "{{ vault_azure_tenant_id }}"
+  delegate_to: localhost
+  register: _arc_ext_info
+
+- name: Decide if AMA extension install is needed
+  ansible.builtin.set_fact:
+    _ama_already_installed: >-
+      {{
+        (_arc_ext_info.machineextensions | default([]) | selectattr('name', 'equalto', arc_monitor_extension_name) | list | length) > 0
+      }}
+    
+
+# Deploy AMA extension (runs against Azure ARM, so execute on controller)
+- name: Install/Remove Azure Monitor Agent extension on Arc machine
+  azure.azcollection.azure_rm_arcmachineextensions:
+    state: "{{ arc_monitor_state }}"
+    resource_group: "{{ arc_resource_group }}"
+    machine_name: "{{ arc_machine_name }}"
+    name: "{{ arc_monitor_extension_name }}"
+    location: "{{ arc_location }}"
+    # Credentials passed explicitly (service principal)
+    auth_source: "auto"
+    subscription_id: "{{ vault_azure_subscription_id }}"
+    client_id: "{{ vault_azure_client_id }}"
+    secret: "{{ vault_azure_client_secret }}"
+    tenant: "{{ vault_azure_tenant_id }}"
+    properties:
+      publisher: "{{ arc_monitor_publisher }}"
+      type: "{{ _arc_monitor_extension_type }}"
+      enable_automatic_upgrade: "{{ arc_monitor_enable_automatic_upgrade }}"
+      auto_upgrade_minor_version: "{{ arc_monitor_auto_upgrade_minor_version }}"
+      type_handler_version: "{{ arc_monitor_type_handler_version if arc_monitor_type_handler_version|length>0 else omit }}"
+      force_update_tag: "{{ arc_monitor_force_update_tag if arc_monitor_force_update_tag|length>0 else omit }}"
+  delegate_to: localhost
+  when: arc_monitor_state != 'present' or not _ama_already_installed
+
+- name: Check if DCR association already exists for this Arc machine
+  azure.azcollection.azure_rm_monitordatacollectionruleassociation_info:
+    resource_uri: "/subscriptions/{{ vault_azure_subscription_id }}/resourceGroups/{{ arc_resource_group }}/providers/Microsoft.HybridCompute/machines/{{ arc_machine_name }}"
+    auth_source: "auto"
+    subscription_id: "{{ vault_azure_subscription_id }}"
+    client_id: "{{ vault_azure_client_id }}"
+    secret: "{{ vault_azure_client_secret }}"
+    tenant: "{{ vault_azure_tenant_id }}"
+  delegate_to: localhost
+  register: _dcra_info
+  when: arc_dcr_id | length > 0 and arc_monitor_state == 'present'
+
+- name: Decide if DCR association is needed
+  ansible.builtin.set_fact:
+    _dcra_already_exists: >-
+      {{
+        (_dcra_info.datacollectionruleassociations | default([]) | selectattr('data_collection_rule_id', 'equalto', arc_dcr_id) | list | length) > 0
+      }}
+  when: arc_dcr_id | length > 0 and arc_monitor_state == 'present'
+
+# Associate DCR (optional)
+- name: Associate AMA with a Data Collection Rule (DCR) when arc_dcr_id is provided
+  azure.azcollection.azure_rm_monitordatacollectionruleassociation:
+    state: present
+    association_name: "{{ arc_dcra_name }}"
+    # Resource ID of the Arc machine
+    resource_uri: "/subscriptions/{{ vault_azure_subscription_id }}/resourceGroups/{{ arc_resource_group }}/providers/Microsoft.HybridCompute/machines/{{ arc_machine_name }}"
+    data_collection_rule_id: "{{ arc_dcr_id }}"
+    # Credentials passed explicitly
+    auth_source: "auto"
+    subscription_id: "{{ vault_azure_subscription_id }}"
+    client_id: "{{ vault_azure_client_id }}"
+    secret: "{{ vault_azure_client_secret }}"
+    tenant: "{{ vault_azure_tenant_id }}"
+  delegate_to: localhost
+  when: arc_dcr_id | length > 0 and arc_monitor_state == 'present' and not _dcra_already_exists
+
+- name: Summary message
+  ansible.builtin.debug:
+    msg:
+      - "AMA extension installed? {{ _ama_already_installed | default('unknown') }}"
+      - "DCR association exists? {{ _dcra_already_exists | default('unknown') }}"
+  when: arc_monitor_state == 'present'

@@ -1,0 +1,48 @@
+---
+- name: Validate required variables for Arc extension deployment
+  ansible.builtin.assert:
+    that:
+      - arc_resource_group | length > 0
+      - arc_location | length > 0
+      - arc_machine_name | length > 0
+      - arc_extension_name | length > 0
+      - arc_extension_publisher | length > 0
+      - arc_extension_type | length > 0
+      - vault_azure_client_id is defined
+      - vault_azure_client_secret is defined
+      - vault_azure_tenant_id is defined
+      - vault_azure_subscription_id is defined
+    fail_msg: >
+      Missing required vars.
+      Extension vars: arc_resource_group, arc_location, arc_machine_name, arc_extension_name, arc_extension_publisher, arc_extension_type.
+      Vault vars: vault_azure_client_id, vault_azure_client_secret, vault_azure_tenant_id, vault_azure_subscription_id.
+  no_log: true
+
+- name: Deploy/Remove Defender extension on Arc machine
+  azure.azcollection.azure_rm_arcmachineextensions:
+    state: "{{ arc_extension_state | default('present') }}"
+    resource_group: "{{ arc_resource_group }}"
+    machine_name: "{{ arc_machine_name }}"
+    name: "{{ arc_extension_name }}"
+    location: "{{ arc_location }}"
+
+    # ✅ Credentials passed directly (supported parameters)
+    auth_source: "auto"
+    subscription_id: "{{ vault_azure_subscription_id }}"
+    client_id: "{{ vault_azure_client_id }}"
+    secret: "{{ vault_azure_client_secret }}"
+    tenant: "{{ vault_azure_tenant_id }}"
+
+    # ✅ Extension details MUST be under properties:
+    properties:
+      publisher: "{{ arc_extension_publisher }}"
+      type: "{{ arc_extension_type }}"
+      type_handler_version: "{{ arc_extension_type_handler_version | default(omit) }}"
+      settings: "{{ arc_extension_settings | default(omit) }}"
+      protected_settings: "{{ arc_extension_protected_settings | default(omit) }}"
+      enable_automatic_upgrade: "{{ arc_extension_enable_automatic_upgrade | default(omit) }}"
+      auto_upgrade_minor_version: "{{ arc_extension_auto_upgrade_minor_version | default(omit) }}"
+      force_update_tag: "{{ arc_extension_force_update_tag | default(omit) }}"
+  delegate_to: localhost
+  no_log: true
+

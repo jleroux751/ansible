@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  role_name: arc_defender_extension
+  author: sysadmin
+  description: Deploy Microsoft Defender for Endpoint/Defender extension to Azure Arc-enabled servers using azure_rm_arcmachineextensions
+  license: MIT
+  min_ansible_version: "2.16"
+dependencies: []

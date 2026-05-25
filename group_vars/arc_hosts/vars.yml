@@ -1,5 +1,25 @@
+# Existing
 azure_arc_resource_group: "my-arc-rg"
-azure_arc_location : "canadacentral"
-
+azure_arc_location: "canadacentral"
 azure_arc_subscription_id: "{{ vault_azure_subscription_id }}"
 azure_arc_tenant_id: "{{ vault_azure_tenant_id }}"
+
+# For arc_defender_extension role
+arc_resource_group: "{{ azure_arc_resource_group }}"
+arc_location: "{{ azure_arc_location }}"
+arc_machine_name: "{{ inventory_hostname.split('.')[0] }}"
+
+# Extension identity (YOU set these to correct values for your Defender/MDE extension)
+arc_extension_name: "MDE.Linux"
+arc_extension_publisher: "Microsoft.Azure.AzureDefenderForServers"
+arc_extension_type: "MDE.Linux"
+
+# Optional extension properties
+arc_extension_settings: {}
+arc_extension_protected_settings: {}
+arc_extension_state: "present"
+
+# Optional: DCR association (recommended)
+# Put your DCR resource id here (created in Azure Monitor)
+arc_dcr_id: "/subscriptions/bf14bb08-5739-4b84-8606-ae8537cda18a/resourceGroups/my-arc-rg/providers/Microsoft.Insights/dataCollectionRules/arc-basic-dcr"
+

@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  role_name: arc_monitor_extension
+  author: sysadmin
+  description: Install Azure Monitor Agent (AMA) extension on Azure Arc-enabled servers and optionally associate a Data Collection Rule (DCR).
+  license: MIT
+  min_ansible_version: "2.16"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+
+dependencies: []

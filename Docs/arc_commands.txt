@@ -48,6 +48,17 @@ sudo rm -rf /var/lib/GuestConfig /opt/azcmagent
 mkdir -p roles/arc_defender_extension/{defaults,tasks,meta}
 
 
+az extension add --name connectedmachine
+az connectedmachine extension image list --location canadacentral -o table
+
+
+# Azure Monitor
+# Optional: DCR association (recommended)
+# Put your DCR resource id here (created in Azure Monitor)
+arc_dcr_id: "/subscriptions/bf14bb08-5739-4b84-8606-ae8537cda18a/resourceGroups/my-arc-rg/providers/Microsoft.Insights/dataCollectionRules/arc-basic-dcr"
+
+
+
 
 
 

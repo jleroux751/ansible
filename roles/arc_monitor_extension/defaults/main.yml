@@ -1,0 +1,36 @@
+---
+# arc_monitor_extension role defaults
+
+# Arc machine placement
+arc_resource_group: ""        # required
+arc_location: ""              # required (Arc machine location)
+arc_machine_name: "{{ inventory_hostname }}"  # override if your Arc resource name differs
+
+# Choose OS automatically; you can override explicitly
+arc_monitor_os: "auto"        # auto|linux|windows
+
+# Azure Monitor Agent extension identity
+# Defaults based on Azure Arc VM extension catalog:
+# Linux:  publisher Microsoft.Azure.Monitor, type AzureMonitorLinuxAgent
+# Windows: publisher Microsoft.Azure.Monitor, type AzureMonitorWindowsAgent
+arc_monitor_publisher: "Microsoft.Azure.Monitor"
+arc_monitor_type_linux: "AzureMonitorLinuxAgent"
+arc_monitor_type_windows: "AzureMonitorWindowsAgent"
+
+# Extension instance name (resource name under machines/extensions)
+arc_monitor_extension_name: "AzureMonitorAgent"
+
+# Optional extension version controls
+arc_monitor_type_handler_version: ""  # optional, leave empty for platform default
+arc_monitor_enable_automatic_upgrade: true
+arc_monitor_auto_upgrade_minor_version: true
+arc_monitor_force_update_tag: ""      # optional
+
+# Data Collection Rule (DCR) association
+# IMPORTANT: Installing AMA does not create/associate a DCR automatically.
+# Provide an existing DCR resource ID to associate.
+arc_dcr_id: ""               # optional but recommended
+arc_dcra_name: "ama-association"  # association name
+
+# State
+arc_monitor_state: "present"  # present|absent

@@ -1,0 +1,21 @@
+---
+# Azure auth style for azure.azcollection
+arc_auth_source: "env"
+
+# Azure Arc target
+arc_machine_name: "{{ inventory_hostname }}"   # Arc machine resource name (often hostname)
+arc_resource_group: ""                         # required
+arc_location: ""                               # required (Arc machine region)
+
+# Extension identity (parameterised)
+arc_extension_name: ""         # e.g. "MDE.Windows" (example seen in the field) [4](https://remilner.co.uk/azure-arc-extension/)
+arc_extension_publisher: ""    # from Azure Arc extension catalogue
+arc_extension_type: ""         # extension type
+
+# Extension config (optional)
+arc_extension_settings: {}
+arc_extension_protected_settings: {}
+
+# State
+arc_extension_state: "present"  # present|absent
+
