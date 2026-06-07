@@ -1,7 +1,6 @@
 
 Passw0rd*2000!.
 
-
 # Create SPN
 az ad sp create-for-rbac --name Ansible_SPN --role Contributor --scopes /subscriptions/bf14bb08-5739-4b84-8606-ae8537cda18a/resourceGroups/HybridServers
 # client id: fa7a507a-21e4-41bf-8055-6f5310be0c04
@@ -29,7 +28,9 @@ ansible-playbook -i hosts playbooks/onboard_arc.yml --syntax-check --ask-vault-p
 ansible-vault view group_vars/arc_hosts/vault.yml --ask-vault-pass
 
 # execute playbook
-ansible-playbook -i hosts playbooks/onboard_arc.yml \
+source ~/ansible-azure-env/bin/activate
+cd /etc/ansible/
+ansible-playbook -i inventories/lab/hosts.yml playbooks/onboard_arc.yml -l linux \
   --ask-vault-pass \
   --ask-pass \
   --ask-become-pass
@@ -47,19 +48,20 @@ sudo rm -rf /var/lib/GuestConfig /opt/azcmagent
 ### Defender extention
 mkdir -p roles/arc_defender_extension/{defaults,tasks,meta}
 
-
 az extension add --name connectedmachine
 az connectedmachine extension image list --location canadacentral -o table
-
 
 # Azure Monitor
 # Optional: DCR association (recommended)
 # Put your DCR resource id here (created in Azure Monitor)
 arc_dcr_id: "/subscriptions/bf14bb08-5739-4b84-8606-ae8537cda18a/resourceGroups/my-arc-rg/providers/Microsoft.Insights/dataCollectionRules/arc-basic-dcr"
 
+sudo cp ~/ansiblell/group_vars/all/vault.yml /etc/ansible/group_vars/all/
 
 
 
+ansible-galaxy collection install -r ~/ansible/collections/requirements.yml
+[ERROR]: The requirements file '/home/sysadmin/your-project/collections/requirements.yml' does not exist.
 
 
 
